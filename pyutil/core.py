@@ -66,12 +66,18 @@ class Core():
     def toggleLED(self):
         GPIO.output(ledOutput, GPIO.input(LED))
     
-    # def toggleImage(self):
-    #     self.toggle = not self.toggle
-    #     if self.toggle:
-    #         self.showImage("assets/face.png")
-    #     else:
-    #         self.showImage("assets/logo.png")
+    def showImage(self, fname):
+        if self.lcd is None:
+            return
+        self.lcd.read_all()
+        self.lcd.write(open(fname, "rb").read())
+    
+    def toggleImage(self):
+        self.toggle = not self.toggle
+        if self.toggle:
+            self.showImage("assets/face.png")
+        else:
+            self.showImage("assets/logo.png")
 
     def on_lcd_btn_press(self, gpioValue):
         """
