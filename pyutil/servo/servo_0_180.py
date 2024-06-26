@@ -21,7 +21,7 @@ def setAngle(angle):      # make the servo rotate to specific angle (0-180 degre
     angle = max(0, min(180, angle))
     pulse_width = map(angle, 0, 180, SERVO_MIN_PULSE, SERVO_MAX_PULSE)
     pwm = map(pulse_width, 0, 20000, 0, 100)
-    p.ChangeDutyCycle(pwm)#map the angle to duty cycle and output it
+    p.ChangeDutyCycle(pwm) # map the angle to duty cycle and output it
 
 def loop():
     while True:

@@ -2,21 +2,18 @@
 import threading, serial, time, sys
 import RPi.GPIO as GPIO #type: ignore
 
-FACE = 20
-LOGO = 21
+IMG = 21
 baud_rate = 115200
 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(FACE, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(LOGO, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-prev_face = GPIO.input(FACE)
-prev_logo = GPIO.input(LOGO)
-print(f"original state of face: {prev_face}")
-print(f"original state of logo: {prev_logo}")
-time.sleep(1)
+GPIO.setup(IMG, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+prev_img = GPIO.input(IMG)
+print(f"original state of user input: {prev_img}")
+time.sleep(0.5)
 
 class SerialModule:
     def __init__(self):
+        self.toggleImg = False
         self.isPortOpen = False
         self.recvData = bytearray()
         self.event = threading.Event()
@@ -33,7 +30,7 @@ class SerialModule:
             if (time_end - time_start > timeout):
                 result = False
                 self.stop()
-                print("timeout:{0}sec".format(timeout))
+                print("lcd display response timeout:{0}sec".format(timeout))
                 break
 
             buff = self.ser.read()
@@ -79,43 +76,25 @@ if __name__ == "__main__":
         serialModule.open("/dev/ttyACM0", baud_rate)
         time.sleep(1)
         while True:
-            input_face = GPIO.input(FACE)
-            print(f"GPIO Face: {input_face}")
-            time.sleep(0.5)
-            input_logo = GPIO.input(LOGO)
-            print(f"GPIO Logo: {input_logo}")
-            time.sleep(0.5)
-            print(f"port open or not: {serialModule.isPortOpen}")
+            input_img = GPIO.input(IMG)
+            print(f"user input: {input_img}")
             time.sleep(0.5)
 
             if serialModule.isPortOpen:
-                if input_face == GPIO.LOW:
+                if input_img == GPIO.LOW:
+                    serialModule.toggleImg = not serialModule.toggleImg
                     serialModule.send('test'.encode())
                     time.sleep(0.5)
                     result, data = serialModule.recv(10)
                     print(result)
-                    print(data)
 
-                    serialModule.switchImage("face.png")
+                    if serialModule.toggleImg: showImage = "face.png"
+                    else: showImage = "logo.png"
+                    serialModule.switchImage(showImage)
                     time.sleep(0.5)
                     result, data = serialModule.recv(10)
                     print(result)
-                    print(data)
                 
-                if input_logo == GPIO.LOW:
-                    serialModule.send('test'.encode())
-                    time.sleep(0.5)
-                    result, data = serialModule.recv(10)
-                    print(result)
-                    print(data)
-
-                    serialModule.switchImage("logo.png")
-                    time.sleep(0.5)
-                    result, data = serialModule.recv(10)
-                    print(result)
-                    print(data)
-
-
     except KeyboardInterrupt:
         print("Program interrupted by user.")
     except Exception as e:

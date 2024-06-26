@@ -1,15 +1,15 @@
-# Input 
+# Inputs
+
 # Buttons
-LED = 21 
-UP = 27
-DOWN = 22
+LCD = 21 
+UP = 20
+DOWN = 16
+AUDO = 19
 
-#Output
-# LCD
-LCD = 15
-
-# LED Output for testing purpose
-ledOutput = 26
+# Outputs
 
 # Motor Pin
-SERVO = 17 
+SERVO = 26
+
+# variables
+baud_rate = 230400
