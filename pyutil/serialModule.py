@@ -1,6 +1,5 @@
 #! /usr/bin/env python
 import threading, time, serial
-from pyutil.constants import baud_rate
 
 class SerialModule:
     def __init__(self):
@@ -8,8 +7,6 @@ class SerialModule:
         self.isPortOpen = False
         self.recvData = bytearray()
         self.event = threading.Event()
-        self.open("/dev/ttyACM0", baud_rate)
-        time.sleep(5)
 
     def recv(self, timeout=3):
         time_start = time.time()
@@ -45,8 +42,9 @@ class SerialModule:
 
     def open(self, tty, baud=115200):
         try:
-            self.ser = serial.Serial(tty, baud, timeout=0.1)
+            self.ser = serial.Serial(tty, baud, timeout=1)
             self.isPortOpen = True
+            print('_________Opened Serial Port_________')
         except Exception as e:
             self.isPortOpen = False
 
@@ -60,3 +58,4 @@ class SerialModule:
         self.stop()
         if (self.isPortOpen):
             self.ser.close()
+            self.isPortOpen = False
