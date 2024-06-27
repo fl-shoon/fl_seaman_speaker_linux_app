@@ -2,7 +2,7 @@ import os, time
 from subprocess import run
 from app import App
 
-modules = ["serial", "pygame", "keyboard"]
+modules = ["pyserial", "pygame", "keyboard"]
 
 class Admin:
     def __init__(self):
@@ -15,7 +15,7 @@ class Admin:
         except ModuleNotFoundError:
             if not os.path.exists("requirements.txt"):
                 f = open("requirements.txt", "w")
-                f.write("serial\npygame\nkeyboard\n")
+                f.write("pyserial\npygame\nkeyboard\n")
             run(f"sudo python -m pip install -r requirements.txt --break-system-packages", shell=True)
 
     def init_app(self):

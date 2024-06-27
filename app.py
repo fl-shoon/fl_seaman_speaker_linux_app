@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 import RPi.GPIO as GPIO # type: ignore
 import threading, time, pygame, serial
-from pyutil.constants import LCD, SERVO, UP, DOWN, AUDO, baud_rate
+from pyutil.constants import LCD, SERVO, UP, DOWN, AUDO
 
 class App():
     _instance = None
@@ -33,16 +33,19 @@ class App():
 
             self.isPortOpen = False
             self.toggleImg = False
+            self.logo = None
+            self.ser = None
             self.recvData = bytearray()
             self.stop_event = threading.Event()
             self.serial_event = threading.Event()
 
-            serial_thread = threading.Thread(target=self.open, args=("/dev/ttyACM0",), kwargs={'baud': 115200, 'timeout': 3})
-            serial_thread.start()
-            serial_thread.join(15)
+            # Serial initialization
+            self.serial_thread = threading.Thread(target=self.open, args=("/dev/ttyACM0",), kwargs={'baud': 115200, 'timeout': 3})
+            self.serial_thread.start()
+            self.serial_thread.join(15)
 
-            print('_________Serial initialized_________')
-            
+    def show_logo(self):
+        if self.isPortOpen:
             self.send('test'.encode())
             time.sleep(0.5)
             result, data = self.recv(10)
@@ -52,9 +55,10 @@ class App():
             time.sleep(0.5)
             result, data = self.recv(10)
             print(result)
+            self.logo = True
 
             print('_________Logo image displayed_________')
-
+    
     def open(self, tty, baud=115200, timeout=0.1):
         try:
             self.ser = serial.Serial(tty, baud, timeout=timeout)
@@ -101,6 +105,18 @@ class App():
     
     def run(self):
         while not self.stop_event.is_set(): 
+            if self.ser is None and not self.isPortOpen:
+                print(f"serial: {self.ser}")
+                self.open("/dev/ttyACM0")
+            time.sleep(0.5)
+
+            if self.logo is None: 
+                if not self.serial_thread.is_alive():
+                    logo_thread = threading.Thread(target=self.show_logo)
+                    logo_thread.start()
+                    logo_thread.join(3)
+            time.sleep(0.5)
+            
             input_img = GPIO.input(LCD)
             print(f"user input lcd: {input_img}")
             time.sleep(0.5)
@@ -130,7 +146,7 @@ class App():
                     time.sleep(0.5)
                     result, data = self.recv(10)
                     print(result)
-                
+            
             if GPIO.input(UP) == GPIO.LOW:
                 self.set_angle(0)
                 time.sleep(0.5)
