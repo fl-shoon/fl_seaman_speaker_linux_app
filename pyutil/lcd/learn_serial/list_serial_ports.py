@@ -1,5 +1,4 @@
 from subprocess import run
-import time
 
 def run_main():
     import serial.tools.list_ports # type: ignore

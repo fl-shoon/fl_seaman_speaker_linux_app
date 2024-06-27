@@ -1,7 +1,22 @@
 #! /usr/bin/env python
 import RPi.GPIO as GPIO # type: ignore
 import threading, time, pygame, serial
-from pyutil.constants import LCD, SERVO, UP, DOWN, AUDO
+
+# Inputs
+
+# Buttons
+LCD = 21 
+UP = 20
+DOWN = 16
+AUDO = 19
+
+# Outputs
+
+# Motor Pin
+SERVO = 26
+
+# variables
+baud_rate = 230400
 
 class App():
     _instance = None
